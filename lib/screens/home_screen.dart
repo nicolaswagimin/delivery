@@ -28,21 +28,23 @@ class HomeScreen extends StatelessWidget {
     final cartProvider = Provider.of<CartProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildWelcomeText(),
-            const SizedBox(height: 20),
-            _buildSearchBar(),
-            const SizedBox(height: 20),
-            _buildCategories(),
-            const SizedBox(height: 30),
-            _buildProductGrid(context, cartProvider),
-          ],
+      backgroundColor: AppColors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 19),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 28),
+              _buildLogo(),
+              const SizedBox(height: 60),
+              _buildSearchAndFilter(),
+              const SizedBox(height: 24),
+              _buildCategories(),
+              const SizedBox(height: 24),
+              _buildProductGrid(context, cartProvider),
+            ],
+          ),
         ),
       ),
       floatingActionButton: _buildCartFab(context, cartProvider),
@@ -51,121 +53,146 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.white,
-      elevation: 0,
-      title: Text(
-        'Foodgo',
-        style: GoogleFonts.lobster(
-          fontSize: 30,
-          color: AppColors.primary,
-        ),
+  Widget _buildLogo() {
+    return Text(
+      'Foodgo',
+      style: GoogleFonts.lobster(
+        fontSize: 45,
+        color: AppColors.textDark,
+        height: 1.34688,
       ),
-      actions: [
+    );
+  }
+
+  Widget _buildSearchAndFilter() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 19,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search',
+                hintStyle: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: AppColors.textLight,
+                ),
+                prefixIcon: Icon(Icons.search, color: AppColors.textLight),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 18,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 13),
         Container(
-          margin: const EdgeInsets.only(right: 10),
+          width: 60,
+          height: 60,
           decoration: BoxDecoration(
             color: AppColors.primary,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(20),
           ),
-          child: IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
+          child: Icon(Icons.tune, color: AppColors.white, size: 24),
         ),
       ],
-    );
-  }
-
-  Widget _buildWelcomeText() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Order your favorite food!',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textDark,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: AppColors.greyLight, width: 1),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.search, color: AppColors.greyMedium),
-          const SizedBox(width: 10),
-          Text(
-            'Search',
-            style: GoogleFonts.poppins(color: AppColors.greyMedium),
-          ),
-        ],
-      ),
     );
   }
 
   Widget _buildCategories() {
-    return Container(
-      height: 45,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories[index];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: categories.asMap().entries.map((entry) {
+          final index = entry.key;
+          final category = entry.value;
           final isSelected = index == 0;
-          return _buildCategoryChip(category, isSelected);
-        },
-      ),
-    );
-  }
-
-  Widget _buildCategoryChip(String label, bool isSelected) {
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? AppColors.primary : AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.greyLight,
-          width: 1.5,
-        ),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          color: isSelected ? Colors.white : AppColors.textDark,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-        ),
+          return Padding(
+            padding: EdgeInsets.only(
+              right: index < categories.length - 1 ? 10 : 0,
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : const Color(0xFFF0F0F0),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Text(
+                category,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? AppColors.white : AppColors.textLight,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
 
   Widget _buildProductGrid(BuildContext context, CartProvider cartProvider) {
+    final products = [
+      Product(
+        id: '1',
+        name: 'Cheeseburger Wendy\'s Burger',
+        image:
+            'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400',
+        price: 8.24,
+        rating: 4.9,
+      ),
+      Product(
+        id: '2',
+        name: 'Hamburger Veggie Burger',
+        image:
+            'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400',
+        price: 6.99,
+        rating: 4.8,
+      ),
+      Product(
+        id: '3',
+        name: 'Hamburger Chicken Burger',
+        image:
+            'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400',
+        price: 7.49,
+        rating: 4.6,
+      ),
+      Product(
+        id: '4',
+        name: 'Fried Chicken Burger',
+        image:
+            'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400',
+        price: 8.99,
+        rating: 4.5,
+      ),
+    ];
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 15,
-        mainAxisSpacing: 15,
-        childAspectRatio: 0.7,
+        childAspectRatio: 0.8,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
       ),
-      itemCount: demoProducts.length,
+      itemCount: products.length,
       itemBuilder: (context, index) {
-        final product = demoProducts[index];
-        return _buildProductCard(context, product, cartProvider);
+        return _buildProductCard(context, products[index], cartProvider);
       },
     );
   }
@@ -190,74 +217,88 @@ class HomeScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
-        child: Stack(
-          clipBehavior: Clip.none,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                    child: Image.network(
-                      product.imageUrl,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                child: Image.network(
+                  product.image,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: AppColors.grey,
+                      child: Center(
+                        child: Icon(
+                          Icons.fastfood,
+                          size: 40,
+                          color: AppColors.greyMedium,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '\$${product.price.toStringAsFixed(2)}',
-                            style: GoogleFonts.poppins(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              cartProvider.toggleFavorite(product.id);
-                            },
-                            child: Icon(
-                              cartProvider.isFavorite(product.id)
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: cartProvider.isFavorite(product.id)
-                                  ? AppColors.primary
-                                  : AppColors.grey,
-                              size: 20,
-                            ),
-                          ),
-                        ],
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.star,
+                        size: 16,
+                        color: const Color(0xFFFF9B00),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        product.rating.toString(),
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      const Spacer(),
+                      Icon(
+                        Icons.favorite_border,
+                        size: 20,
+                        color: AppColors.textDark,
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -274,77 +315,64 @@ class HomeScreen extends StatelessWidget {
         );
       },
       backgroundColor: AppColors.primary,
-      shape: const CircleBorder(),
-      elevation: 6,
-      child: Stack(
-        children: [
-          const Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 28),
-          if (cartProvider.itemCount > 0)
-            Positioned(
-              right: -5,
-              top: -5,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  cartProvider.itemCount.toString(),
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ),
+      child: const Icon(Icons.add, size: 32),
     );
   }
 
   Widget _buildBottomNavBar(BuildContext context) {
     return BottomAppBar(
-      color: AppColors.primary,
       shape: const CircularNotchedRectangle(),
       notchMargin: 8,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.home_outlined, color: Colors.white, size: 28),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.favorite_outline, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FavoritesScreen()),
-              );
-            },
-          ),
-          const SizedBox(width: 48),
-          IconButton(
-            icon: const Icon(Icons.person_outline, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const UserProfileScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.chat_bubble_outline, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CustomerSupportScreen()),
-              );
-            },
-          ),
-        ],
+      color: AppColors.primary,
+      child: SizedBox(
+        height: 70,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.home, size: 28),
+              color: AppColors.white,
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.person_outline, size: 28),
+              color: AppColors.white,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UserProfileScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 48),
+            IconButton(
+              icon: const Icon(Icons.chat_outlined, size: 28),
+              color: AppColors.white,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CustomerSupportScreen(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.favorite_outline, size: 28),
+              color: AppColors.white,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FavoritesScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
