@@ -8,230 +8,241 @@ class UserProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  _buildInfoSection(),
-                  const SizedBox(height: 24),
-                  _buildActionButtons(context),
-                  const SizedBox(height: 40),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFF6B6B), Color(0xFFFF3D3D)],
-        ),
-      ),
-      child: SafeArea(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const Spacer(),
-                  const SizedBox(width: 48),
-                ],
-              ),
-            ),
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 4),
-              ),
-            ),
-            const SizedBox(height: 20),
+            _buildHeaderSection(context),
+            _buildWhiteSection(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoSection() {
+  Widget _buildHeaderSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
-        ],
+      width: double.infinity,
+      height: 250,
+      decoration: const BoxDecoration(
+        gradient: RadialGradient(
+          center: Alignment(0, -0.2),
+          radius: 0.6,
+          colors: [Color(0xFFFF2A9D), Color(0xFFEF2A39)],
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(35)),
       ),
-      child: Column(
+      child: Stack(
         children: [
-          const SizedBox(height: 20),
-          Text(
-            'Sophie Patel',
-            style: GoogleFonts.poppins(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textDark,
+          Positioned(
+            left: 15,
+            top: 26,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, size: 28, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'sophiepatel@email.com',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: AppColors.textLight,
+          Positioned(
+            right: 20,
+            top: 28,
+            child: IconButton(
+              icon: const Icon(Icons.settings, size: 24, color: Colors.white),
+              onPressed: () {},
             ),
           ),
-          const SizedBox(height: 24),
-          const Divider(),
-          const SizedBox(height: 24),
-          _buildInfoItem('Delivery address', '123 Main St Apt 4A,New York, NY'),
-          const SizedBox(height: 20),
-          const Divider(),
-          const SizedBox(height: 20),
-          _buildPaymentDetails(),
+          Positioned(
+            top: 90,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                width: 130,
+                height: 130,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD9D9D9),
+                  borderRadius: BorderRadius.circular(35),
+                  border: Border.all(color: const Color(0xFFEF2A39), width: 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoItem(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildWhiteSection(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 43, vertical: 40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTextField('Name', 'Sophia Patel'),
+          const SizedBox(height: 30),
+          _buildTextField('Email', 'sophiapatel@gmail.com'),
+          const SizedBox(height: 30),
+          _buildTextField('Delivery address', '123 Main St Apartment 4A,New York, NY'),
+          const SizedBox(height: 30),
+          _buildTextField('Password', '••••••••••', isPassword: true),
+          const SizedBox(height: 50),
+          Container(
+            width: 343,
+            height: 1,
+            color: const Color(0xFFE8E8E8),
+          ),
+          const SizedBox(height: 30),
+          _buildMenuItem('Payment Details'),
+          const SizedBox(height: 30),
+          _buildMenuItem('Order history'),
+          const SizedBox(height: 80),
+          _buildButtons(context),
+          const SizedBox(height: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, String value, {bool isPassword = false}) {
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textLight),
+        Container(
+          width: 343,
+          height: 56,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 2),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF3C2F2F),
+                ),
+              ),
+            ),
+          ),
         ),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: AppColors.textDark,
-            fontWeight: FontWeight.w500,
+        Positioned(
+          left: 24,
+          top: -12,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            color: Colors.white,
+            child: Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF999999),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildPaymentDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Payment Details',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textDark,
+  Widget _buildMenuItem(String title) {
+    return SizedBox(
+      width: 343,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF999999),
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Order history',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: AppColors.textDark,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [const Icon(Icons.arrow_forward, color: AppColors.primary)],
-        ),
-      ],
+          const Icon(Icons.chevron_right, size: 24, color: Color(0xFF999999)),
+        ],
+      ),
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildButtons(BuildContext context) {
     return Row(
       children: [
         Expanded(
-          child: _buildActionButton(
-            'Edit Profile',
-            AppColors.textDark,
-            Colors.white,
-            () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit profile coming soon')),
-              );
-            },
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFF443333),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: InkWell(
+              onTap: () {},
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Edit Profile',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.edit, size: 24, color: Colors.white),
+                ],
+              ),
+            ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 20),
         Expanded(
-          child: _buildActionButton(
-            'Log out',
-            Colors.white,
-            AppColors.primary,
-            () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Logged out successfully')),
-              );
-            },
+          child: Container(
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFEF2A39), width: 2),
+            ),
+            child: InkWell(
+              onTap: () {},
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Log out',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFFEF2A39),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.logout, size: 24, color: Color(0xFFEF2A39)),
+                ],
+              ),
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildActionButton(
-    String label,
-    Color textColor,
-    Color bgColor,
-    VoidCallback onPressed,
-  ) {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: bgColor == AppColors.textDark
-              ? AppColors.textDark
-              : Colors.transparent,
-          width: 2,
-        ),
-      ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: textColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
     );
   }
 }
