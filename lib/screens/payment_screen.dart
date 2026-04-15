@@ -1,187 +1,292 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
-import '../utils/app_strings.dart';
 import '../providers/cart_provider.dart';
-import '../screens/home_screen.dart';
+import 'home_screen.dart';
 
-class PaymentScreen extends StatelessWidget {
+class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
+
+  @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
+  int _selectedPaymentIndex = 0;
+  bool _saveCard = true;
 
   @override
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
+    final total = cartProvider.total + 2.99 + 5.00;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F8),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          AppStrings.checkout,
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-      ),
+      backgroundColor: AppColors.background,
+      appBar: _buildAppBar(),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              AppStrings.paymentMethod,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  _buildPaymentOption(
-                    context,
-                    icon: Icons.credit_card,
-                    color: Colors.orange,
-                    label: AppStrings.card,
-                    isSelected: cartProvider.selectedPaymentMethod == AppStrings.card,
-                  ),
-                  const Divider(),
-                  _buildPaymentOption(
-                    context,
-                    icon: Icons.account_balance,
-                    color: Colors.pink,
-                    label: AppStrings.bankAccount,
-                    isSelected: cartProvider.selectedPaymentMethod == AppStrings.bankAccount,
-                  ),
-                ],
-              ),
-            ),
+            _buildOrderSummary(total),
+            const SizedBox(height: 24),
+            _buildPaymentMethods(),
+            const SizedBox(height: 24),
+            _buildCardDetails(),
+            const SizedBox(height: 24),
+            _buildSaveCardOption(),
             const SizedBox(height: 40),
-            const Text(
-              AppStrings.deliveryMethod,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-                  _buildDeliveryOption(
-                    context,
-                    label: AppStrings.doorDelivery,
-                    isSelected: cartProvider.selectedDeliveryMethod == AppStrings.doorDelivery,
-                  ),
-                  const Divider(),
-                  _buildDeliveryOption(
-                    context,
-                    label: AppStrings.pickUp,
-                    isSelected: cartProvider.selectedDeliveryMethod == AppStrings.pickUp,
-                  ),
-                ],
-              ),
-            ),
+            _buildPayNowButton(context, cartProvider),
             const SizedBox(height: 40),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  AppStrings.total,
-                  style: TextStyle(fontSize: 18),
-                ),
-                Text(
-                  '\$${cartProvider.total.toStringAsFixed(2)}',
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: () => _showSuccessDialog(context, cartProvider),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                minimumSize: const Size(double.infinity, 70),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: const Text(
-                AppStrings.proceedToPayment,
-                style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPaymentOption(
-    BuildContext context, {
-    required IconData icon,
-    required Color color,
-    required String label,
-    required bool isSelected,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Provider.of<CartProvider>(context, listen: false).selectPaymentMethod(label);
-      },
-      child: Row(
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      backgroundColor: AppColors.background,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Text(
+        'Order summary',
+        style: GoogleFonts.poppins(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: AppColors.textDark,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderSummary(double total) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
+        ],
+      ),
+      child: Column(
         children: [
-          Radio(
-            value: true,
-            groupValue: isSelected,
-            onChanged: (value) {
-              Provider.of<CartProvider>(context, listen: false).selectPaymentMethod(label);
-            },
-            activeColor: AppColors.primary,
+          _buildSummaryRow('Order', '\$15.48'),
+          const SizedBox(height: 12),
+          _buildSummaryRow('Taxes', '\$2.99'),
+          const SizedBox(height: 12),
+          _buildSummaryRow('Delivery fees', '\$5.00'),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(),
           ),
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: Colors.white),
+          _buildSummaryRow(
+            'Total',
+            '\$${total.toStringAsFixed(2)}',
+            isTotal: true,
           ),
-          const SizedBox(width: 15),
-          Text(label, style: const TextStyle(fontSize: 17)),
         ],
       ),
     );
   }
 
-  Widget _buildDeliveryOption(
-    BuildContext context, {
-    required String label,
-    required bool isSelected,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Provider.of<CartProvider>(context, listen: false).selectDeliveryMethod(label);
-      },
-      child: Row(
-        children: [
-          Radio(
-            value: true,
-            groupValue: isSelected,
-            onChanged: (value) {
-              Provider.of<CartProvider>(context, listen: false).selectDeliveryMethod(label);
-            },
-            activeColor: AppColors.primary,
+  Widget _buildSummaryRow(String label, String value, {bool isTotal = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: isTotal ? 18 : 14,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+            color: isTotal ? AppColors.textDark : AppColors.textLight,
           ),
-          Text(label, style: const TextStyle(fontSize: 17)),
+        ),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: isTotal ? 20 : 16,
+            fontWeight: FontWeight.bold,
+            color: isTotal ? AppColors.primary : AppColors.textDark,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentMethods() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Payment methods',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textDark,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            _buildPaymentMethod('Credit card', Icons.credit_card, 0),
+            const SizedBox(width: 16),
+            _buildPaymentMethod('PayPal', Icons.paypal, 1),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPaymentMethod(String label, IconData icon, int index) {
+    final isSelected = _selectedPaymentIndex == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedPaymentIndex = index;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.textDark : AppColors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected ? AppColors.textDark : AppColors.greyLight,
+              width: 2,
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : AppColors.textDark,
+                size: 28,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.white : AppColors.textDark,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardDetails() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Card number',
+            style: GoogleFonts.poppins(
+              color: AppColors.textLight,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            decoration: InputDecoration(
+              hintText: '3864  3846  3846  3847',
+              hintStyle: GoogleFonts.poppins(
+                color: AppColors.textLight,
+                fontSize: 14,
+              ),
+              filled: true,
+              fillColor: AppColors.greyLight.withOpacity(0.3),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSaveCardOption() {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              _saveCard = !_saveCard;
+            });
+          },
+          child: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: _saveCard ? AppColors.primary : Colors.transparent,
+              border: Border.all(
+                color: _saveCard ? AppColors.primary : AppColors.grey,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: _saveCard
+                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                : null,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          'Save card details for future payments',
+          style: GoogleFonts.poppins(color: AppColors.textLight, fontSize: 13),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPayNowButton(BuildContext context, CartProvider cartProvider) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: () {
+          _showSuccessDialog(context, cartProvider);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.textDark,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(),
+            Text(
+              'Pay Now',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Icon(Icons.arrow_forward, color: Colors.white),
+          ],
+        ),
       ),
     );
   }
@@ -190,53 +295,72 @@ class PaymentScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF2F2F2),
-                shape: BoxShape.circle,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 40),
               ),
-              child: const Icon(Icons.check, size: 50, color: Colors.green),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              AppStrings.success,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              AppStrings.paymentSuccess,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                cartProvider.clearCart();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  (route) => false,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+              const SizedBox(height: 24),
+              Text(
+                'Success !',
+                style: GoogleFonts.poppins(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textDark,
                 ),
               ),
-              child: const Text(
-                AppStrings.backToHome,
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              const SizedBox(height: 12),
+              Text(
+                'Your payment was successful. Your food is on the way!',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: AppColors.textLight,
+                  fontSize: 14,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    cartProvider.clearCart();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Go Back',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
