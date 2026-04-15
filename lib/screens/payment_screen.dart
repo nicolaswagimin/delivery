@@ -1,121 +1,113 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import '../utils/app_colors.dart';
-import '../providers/cart_provider.dart';
 import 'home_screen.dart';
 
-class PaymentScreen extends StatefulWidget {
+class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
 
   @override
-  State<PaymentScreen> createState() => _PaymentScreenState();
-}
-
-class _PaymentScreenState extends State<PaymentScreen> {
-  int _selectedPaymentIndex = 0;
-  bool _saveCard = true;
-
-  @override
   Widget build(BuildContext context) {
-    final cartProvider = Provider.of<CartProvider>(context);
-    final total = cartProvider.total + 2.99 + 5.00;
-
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildOrderSummary(total),
-            const SizedBox(height: 24),
-            _buildPaymentMethods(),
-            const SizedBox(height: 24),
-            _buildCardDetails(),
-            const SizedBox(height: 24),
-            _buildSaveCardOption(),
-            const SizedBox(height: 40),
-            _buildPayNowButton(context, cartProvider),
-            const SizedBox(height: 40),
-          ],
+      backgroundColor: AppColors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 19),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 22),
+              _buildAppBar(context),
+              const SizedBox(height: 53),
+              _buildOrderSummary(),
+              const SizedBox(height: 78),
+              _buildPaymentMethods(),
+              const SizedBox(height: 40),
+              _buildCardDetails(),
+              const SizedBox(height: 30),
+              _buildSaveCardOption(),
+              const SizedBox(height: 95),
+              _buildPayNowButton(context),
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.background,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-        onPressed: () => Navigator.pop(context),
-      ),
-      title: Text(
-        'Order summary',
-        style: GoogleFonts.poppins(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textDark,
+  Widget _buildAppBar(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.arrow_back, size: 28, color: Color(0xFF3C2F2F)),
+          onPressed: () => Navigator.pop(context),
         ),
-      ),
+        IconButton(
+          icon: const Icon(Icons.search, size: 20, color: Color(0xFF3C2F2F)),
+          onPressed: () {},
+        ),
+      ],
     );
   }
 
-  Widget _buildOrderSummary(double total) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildSummaryRow('Order', '\$15.48'),
-          const SizedBox(height: 12),
-          _buildSummaryRow('Taxes', '\$2.99'),
-          const SizedBox(height: 12),
-          _buildSummaryRow('Delivery fees', '\$5.00'),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Divider(),
+  Widget _buildOrderSummary() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Order summary',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF3C2F2F),
           ),
-          _buildSummaryRow(
-            'Total',
-            '\$${total.toStringAsFixed(2)}',
-            isTotal: true,
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 50),
+        _buildSummaryRow('Order', '\$16.48'),
+        const SizedBox(height: 74),
+        _buildSummaryRow('Delivery fees', '\$1.5'),
+        const SizedBox(height: 74),
+        _buildSummaryRow('Taxes', '\$0.21'),
+        const SizedBox(height: 55),
+        Container(
+          width: 357,
+          height: 1,
+          color: Color(0xFFF0F0F0),
+        ),
+        const SizedBox(height: 30),
+        _buildSummaryRow('Total', '\$18.19', isTotal: true),
+      ],
     );
   }
 
   Widget _buildSummaryRow(String label, String value, {bool isTotal = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: isTotal ? 18 : 14,
-            fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
-            color: isTotal ? AppColors.textDark : AppColors.textLight,
+    return SizedBox(
+      width: 357,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
+              color: isTotal ? Color(0xFF3C2F2F) : Color(0xFF7D7D7D),
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: isTotal ? 20 : 16,
-            fontWeight: FontWeight.bold,
-            color: isTotal ? AppColors.primary : AppColors.textDark,
+          Text(
+            value,
+            style: TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 18,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
+              color: Color(0xFF3C2F2F),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -126,172 +118,216 @@ class _PaymentScreenState extends State<PaymentScreen> {
         Text(
           'Payment methods',
           style: GoogleFonts.poppins(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textDark,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF3C2F2F),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 40),
         Row(
           children: [
-            _buildPaymentMethod('Credit card', Icons.credit_card, 0),
-            const SizedBox(width: 16),
-            _buildPaymentMethod('PayPal', Icons.paypal, 1),
+            Expanded(
+              child: Container(
+                height: 78,
+                decoration: BoxDecoration(
+                  color: Color(0xFF3C2F2F),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Credit card',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Container(
+                height: 78,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Color(0xFFE5E5E5), width: 1),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'PayPal',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF3C2F2F),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Container(
+                height: 78,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Color(0xFFE5E5E5), width: 1),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Apple Pay',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF3C2F2F),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildPaymentMethod(String label, IconData icon, int index) {
-    final isSelected = _selectedPaymentIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedPaymentIndex = index;
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+  Widget _buildCardDetails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 357,
+          height: 54,
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.textDark : AppColors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected ? AppColors.textDark : AppColors.greyLight,
-              width: 2,
-            ),
+            color: Color(0xFF3C2F2F),
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: Column(
-            children: [
-              Icon(
-                icon,
-                color: isSelected ? Colors.white : AppColors.textDark,
-                size: 28,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : AppColors.textDark,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Text(
+                  'Credit card',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+                const Spacer(),
+                const Icon(Icons.check_circle, color: Color(0xFFEF2A39), size: 20),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildCardDetails() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Card number',
-            style: GoogleFonts.poppins(
-              color: AppColors.textLight,
-              fontSize: 13,
+        const SizedBox(height: 18),
+        Container(
+          width: 357,
+          height: 45,
+          decoration: BoxDecoration(
+            color: Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Text(
+                  '3864  3846  3846  3847',
+                  style: TextStyle(
+                    fontFamily: 'Roboto',
+                    fontSize: 14,
+                    color: Color(0xFF7D7D7D),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          TextField(
-            decoration: InputDecoration(
-              hintText: '3864  3846  3846  3847',
-              hintStyle: GoogleFonts.poppins(
-                color: AppColors.textLight,
-                fontSize: 14,
-              ),
-              filled: true,
-              fillColor: AppColors.greyLight.withOpacity(0.3),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildSaveCardOption() {
     return Row(
       children: [
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _saveCard = !_saveCard;
-            });
-          },
-          child: Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: _saveCard ? AppColors.primary : Colors.transparent,
-              border: Border.all(
-                color: _saveCard ? AppColors.primary : AppColors.grey,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: _saveCard
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
-                : null,
+        Container(
+          width: 22,
+          height: 22,
+          decoration: BoxDecoration(
+            color: Color(0xFFEF2A39),
+            borderRadius: BorderRadius.circular(5),
           ),
+          child: const Icon(Icons.check, color: Colors.white, size: 14),
         ),
         const SizedBox(width: 12),
         Text(
           'Save card details for future payments',
-          style: GoogleFonts.poppins(color: AppColors.textLight, fontSize: 13),
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: Color(0xFF7D7D7D),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildPayNowButton(BuildContext context, CartProvider cartProvider) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: () {
-          _showSuccessDialog(context, cartProvider);
+  Widget _buildPayNowButton(BuildContext context) {
+    return Container(
+      width: 357,
+      height: 54,
+      decoration: BoxDecoration(
+        color: Color(0xFF3C2F2F),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        onTap: () {
+          _showSuccessDialog(context);
         },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.textDark,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SizedBox(),
+            const SizedBox(width: 16),
+            Text(
+              '\$18.19',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            const Spacer(),
             Text(
               'Pay Now',
               style: GoogleFonts.poppins(
-                color: Colors.white,
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
+            const SizedBox(width: 16),
             const Icon(Icons.arrow_forward, color: Colors.white),
+            const SizedBox(width: 16),
           ],
         ),
       ),
     );
   }
 
-  void _showSuccessDialog(BuildContext context, CartProvider cartProvider) {
+  void _showSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -304,9 +340,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(24),
+                width: 70,
+                height: 70,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: Color(0xFFEF2A39),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.check, color: Colors.white, size: 40),
@@ -317,7 +354,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textDark,
+                  color: Color(0xFF3C2F2F),
                 ),
               ),
               const SizedBox(height: 12),
@@ -325,7 +362,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 'Your payment was successful. Your food is on the way!',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
-                  color: AppColors.textLight,
+                  color: Color(0xFF7D7D7D),
                   fontSize: 14,
                 ),
               ),
@@ -335,7 +372,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    cartProvider.clearCart();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                         builder: (context) => const HomeScreen(),
@@ -344,7 +380,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: Color(0xFFEF2A39),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
