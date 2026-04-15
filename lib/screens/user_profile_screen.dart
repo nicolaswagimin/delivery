@@ -11,7 +11,7 @@ class UserProfileScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       body: Column(
         children: [
-          _buildHeader(),
+          _buildHeader(context),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -30,7 +30,7 @@ class UserProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -79,10 +79,7 @@ class UserProfileScreen extends StatelessWidget {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
         ],
       ),
       child: Column(
@@ -123,10 +120,7 @@ class UserProfileScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            color: AppColors.textLight,
-          ),
+          style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textLight),
         ),
         const SizedBox(height: 6),
         Text(
@@ -165,12 +159,7 @@ class UserProfileScreen extends StatelessWidget {
         const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            const Icon(
-              Icons.arrow_forward,
-              color: AppColors.primary,
-            ),
-          ],
+          children: [const Icon(Icons.arrow_forward, color: AppColors.primary)],
         ),
       ],
     );
@@ -220,7 +209,9 @@ class UserProfileScreen extends StatelessWidget {
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: bgColor == AppColors.textDark ? AppColors.textDark : Colors.transparent,
+          color: bgColor == AppColors.textDark
+              ? AppColors.textDark
+              : Colors.transparent,
           width: 2,
         ),
       ),
